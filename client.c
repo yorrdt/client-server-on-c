@@ -10,9 +10,9 @@
 
 int main(int argc, char** argv) {
 
-    int network_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	
-	if (network_socket == -1) {
+	if (client_socket == -1) {
 		perror("[CE]: error in calling socket()");
 		exit(1);
 	}
@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
     server_address.sin_port = htons(8080);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
-    if(connect(network_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
+    if(connect(client_socket, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
 		perror("[CE]: connection error");
-		close(network_socket);
+		close(client_socket);
 		exit(1);
 	}
 	
@@ -35,17 +35,19 @@ int main(int argc, char** argv) {
 		char buffer[1024] = {0};
 		printf("Client: ");
 		fgets(buffer, sizeof(buffer), stdin);
-		send(network_socket, buffer, sizeof(buffer), 0);
+		send(client_socket, buffer, sizeof(buffer), 0);
 		
 		memset(buffer, 0, sizeof(buffer));
 		
-		recv(network_socket, &buffer, sizeof(buffer), 0);
+		recv(client_socket, &buffer, sizeof(buffer), 0);
 		printf("Server: %s", buffer);
 		
 		// sleep(5);
 	}
 	
-    close(network_socket);
+	shutdown(client_socket, SHUT_RDWR);
+	
+    close(client_socket);
 
     return 0;
 }

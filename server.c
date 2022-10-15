@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
         exit(1);
 	}
 	
-	int client_accept = accept(server_socket, NULL, NULL);
+	int client_accept = accept(server_socket, 0, 0);
 		
 	if (client_accept < 0) {
 		perror("[SE]: accept() call failed");
@@ -59,6 +59,8 @@ int main(int argc, char** argv) {
 
 		// sleep(5);
 	}
+	
+	shutdown(client_accept, SHUT_RDWR);
 
 	close(client_accept);
 
